@@ -4,6 +4,8 @@
 import java.io.*;
 import java.util.HashMap;
 import java.util.ArrayList;
+import java.util.regex.Pattern;
+import java.util.regex.Matcher;
 
 public class Main {
 
@@ -32,6 +34,11 @@ public class Main {
     return inputMatrix;
   }
 
+  public static boolean isDigit(char c) {
+    String pattern = "[\\d]"; 
+    return Pattern.matches(pattern, String.valueOf(c));
+  }
+
   public static boolean isSymbol(char c) {
     return c != '.' && (c < '0' || c > '9');
   }
@@ -48,18 +55,22 @@ public class Main {
       if (isSymbol(stringMatrix[rowIndex][numberIndex.get(0) - 1])) return true;
     }
     // check if the element on the right is a valid symbol
-    if (numberIndex.get(numberIndex.size() - 1) < ncol) {
+    if (numberIndex.get(numberIndex.size() - 1) < ncol - 1) {
       if (isSymbol(stringMatrix[rowIndex][numberIndex.get(numberIndex.size() - 1) + 1])) return true;
     }
     // check if there's any symbol in the up and down
     for (int index: numberIndex){
       // checks up
       if (rowIndex > 0) {
-        if (isSymbol(stringMatrix[rowIndex - 1][index])) return true;
+        if (isSymbol(stringMatrix[rowIndex - 1][index])) return true; // checks up
+        if (index + 1 < nrow - 1) if (isSymbol(stringMatrix[rowIndex - 1][index + 1])) return true; // check upper right
+        if (index > 0) if (isSymbol(stringMatrix[rowIndex - 1][index - 1])) return true; // check upper left
       }
       // checks down
-      if (rowIndex < nrow){
-        if (isSymbol(stringMatrix[rowIndex + 1][index])) return true;
+      if (rowIndex < nrow - 1){
+        if (isSymbol(stringMatrix[rowIndex + 1][index])) return true; // checks down
+        if (index + 1 < nrow - 1) if (isSymbol(stringMatrix[rowIndex + 1][index + 1])) return true; // checks lower right
+        if (index > 0) if (isSymbol(stringMatrix[rowIndex + 1][index - 1])) return true; // checks lower left
       }
     }
     return false;
@@ -92,11 +103,11 @@ public class Main {
       // identify numbers and get the indexes
       for (int i = 0; i < nrow; i++){
         for (int j = 0; j < ncol; j++){
-          if (stringMatrix[i][j] == '.') continue;
+          if (!isDigit(stringMatrix[i][j])) continue;
           // if it finds a number will iterate until it reaches a dot again
           ArrayList<Integer> numberIndex = new ArrayList<>();
           for (int k = j; k < ncol; k++){
-            if (stringMatrix[i][k] == '.') break;
+            if (!isDigit(stringMatrix[i][j])) break;
             numberIndex.add(k);
             j++;
           }
@@ -111,6 +122,6 @@ public class Main {
           }
         }
       }
-    System.out.println(sumOfValidNumber);
+    System.out.println("Sum of all valid numbers: " + sumOfValidNumber);
   }
 }
